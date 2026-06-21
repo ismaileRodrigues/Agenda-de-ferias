@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Planejamento de Férias</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <div class="app">
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Gestão visual</p>
+        <h1>Planejamento de Férias - SSL 1</h1>
+        <p class="subtitle">
+          Controle moderno e simplificado para cadastro, edição e acompanhamento de férias da equipe.
+        </p>
+      </div>
+      <div class="year-badge">2026</div>
+    </header>
+
+    <section class="cards" id="cardsResumo"></section>
+
+    <section class="ActionsShell">
+      <div class="actions-top">
+        <div class="actions-left">
+          <span class="title-small">Ações rápidas:</span>
+          <button class="btn btn-primary" id="btnToggleForms" type="button">Mostrar cadastros</button>
+          <button class="btn btn-success" id="btnOpenEmployeeForm" type="button">+ Novo funcionário</button>
+          <button class="btn btn-success" id="btnOpenVacationForm" type="button">+ Agendar férias</button>
+        </div>
+
+        <div class="actions-right">
+          <button class="btn btn-light" id="btnExportJson" type="button">Exportar JSON</button>
+          <button class="btn btn-light" id="btnImportJson" type="button">Importar JSON</button>
+          <input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;" />
+          <button class="btn btn-danger" id="btnClearAllData" type="button">Limpar tudo</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="forms-wrap hidden" id="formsWrap">
+      <div class="form-panel" id="employeeFormPanel">
+        <div class="form-panel-header">
+          <div>
+            <h2 class="form-panel-title" id="tituloFormulario">Cadastrar funcionário</h2>
+            <div class="form-panel-subtitle" id="statusEdicao">Novo registro</div>
+          </div>
+
+          <button type="button" class="btn btn-light" id="btnCloseEmployeeForm">Fechar</button>
+        </div>
+
+        <form id="formFuncionario">
+          <div class="form-grid">
+            <div class="full">
+              <label for="nome">Nome do funcionário</label>
+              <input type="text" id="nome" placeholder="Digite o nome completo" required />
+            </div>
+
+            <div>
+              <label for="matricula">Matrícula</label>
+              <input type="text" id="matricula" placeholder="Ex: 189742" required />
+            </div>
+
+            <div>
+              <label for="supervisor">Supervisor</label>
+              <input type="text" id="supervisor" placeholder="Ex: Ismaile" required />
+            </div>
+
+            <div>
+              <label for="admissao">Data de admissão</label>
+              <input type="date" id="admissao" />
+            </div>
+
+            <div>
+              <label for="saldo">Saldo</label>
+              <input type="number" step="0.01" id="saldo" placeholder="Ex: 6 ou -2" />
+            </div>
+
+            <div>
+              <label for="observacao">Observação</label>
+              <input type="text" id="observacao" placeholder="Ex: retorno em ajuste / recém-admitido" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="btnSalvarFuncionario">Salvar funcionário</button>
+            <button type="button" class="btn btn-light" id="btnCancelarEdicao" style="display:none;">Cancelar
+              edição</button>
+          </div>
+
+          <div class="helper">
+            Use este formulário para cadastrar ou editar funcionário. Os dados ficam salvos no navegador e também podem
+            ser exportados em JSON.
+          </div>
+        </form>
+      </div>
+
+      <div class="form-panel" id="vacationFormPanel">
+        <div class="form-panel-header">
+          <div>
+            <h2 class="form-panel-title">Cadastrar período de férias</h2>
+            <div class="form-panel-subtitle" id="funcionarioSelecionadoLabel">Selecione um funcionário</div>
+          </div>
+
+          <button type="button" class="btn btn-light" id="btnCloseVacationForm">Fechar</button>
+        </div>
+
+        <form id="formFerias">
+          <div class="form-grid">
+            <div class="full">
+              <label for="funcionarioFerias">Funcionário</label>
+              <select id="funcionarioFerias" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="inicioFerias">Data inicial</label>
+              <input type="date" id="inicioFerias" required />
+            </div>
+
+            <div>
+              <label for="fimFerias">Data final</label>
+              <input type="date" id="fimFerias" required />
+            </div>
+
+            <div>
+              <label for="statusFerias">Status</label>
+              <select id="statusFerias">
+                <option value="Planejado">Planejado</option>
+                <option value="Confirmado">Confirmado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="labelFerias">Descrição curta</label>
+              <input type="text" id="labelFerias" placeholder="Ex: 10 dias" />
+            </div>
+
+            <div>
+              <label for="obsFerias">Observação</label>
+              <input type="text" id="obsFerias" placeholder="Opcional" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success" id="btnSalvarFerias">Cadastrar férias</button>
+            <button type="button" class="btn btn-light" id="btnLimparFerias">Limpar campos</button>
+          </div>
+
+          <div class="helper">
+            O sistema alerta automaticamente férias próximas em até 5 dias da data inicial.
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="search-box">
+        <label for="busca">Buscar funcionário</label>
+        <input type="text" id="busca" placeholder="Digite nome, matrícula ou supervisor..." />
+      </div>
+
+      <div class="filter-box">
+        <label for="filtroSaldo">Filtro de saldo</label>
+        <select id="filtroSaldo">
+          <option value="todos">Todos</option>
+          <option value="negativo">Saldo negativo</option>
+          <option value="positivo">Saldo positivo</option>
+          <option value="vazio">Sem saldo informado</option>
+        </select>
+      </div>
+
+      <div class="filter-box">
+        <label for="filtroFerias">Filtro de férias</label>
+        <select id="filtroFerias">
+          <option value="todos">Todos</option>
+          <option value="com">Com férias</option>
+          <option value="sem">Sem férias</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="legend">
+      <div class="legend-item">
+        <span class="dot green"></span>
+        <span>Planejado</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot blue"></span>
+        <span>Confirmado</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot amber"></span>
+        <span>Pendente</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot red"></span>
+        <span>Saldo negativo</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot gray"></span>
+        <span>Sem férias cadastradas</span>
+      </div>
+    </section>
+
+    <section class="board-wrapper">
+      <div class="table-header">
+        <div>
+          <h2>Equipe cadastrada</h2>
+          <p>Controle operacional com foco em leitura rápida da gestão.</p>
+        </div>
+      </div>
+
+      <div class="board">
+        <table>
+          <thead>
+            <tr>
+              <th>Funcionário</th>
+              <th>Supervisor</th>
+              <th>Admissão</th>
+              <th>Saldo</th>
+              <th>Férias cadastradas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyFuncionarios"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="overview">
+      <div class="overview-card">
+        <h3>Próximas férias</h3>
+        <div class="overview-subtitle">Lista em ordem cronológica</div>
+        <div class="overview-list" id="proximasFerias"></div>
+      </div>
+
+      <div class="overview-card">
+        <h3>Alertas de gestão</h3>
+        <div class="overview-subtitle">Pontos de atenção rápidos</div>
+        <div class="overview-list" id="alertasGestao"></div>
+      </div>
+    </section>
+
+  </div>
+  <script src="./script.js"></script>
+
+</body>
+
+</html>
